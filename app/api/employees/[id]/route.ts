@@ -90,6 +90,15 @@ export async function PATCH(
     const updatePayload: Record<string, unknown> = { ...validatedData.data };
     delete updatePayload.reason;
 
+    // Empty strings clear optional enum/photo fields instead of failing validation
+    const unsetPayload: Record<string, ''> = {};
+    for (const key of ['maritalStatus', 'photo'] as const) {
+      if (updatePayload[key] === '') {
+        delete updatePayload[key];
+        unsetPayload[key] = '';
+      }
+    }
+
     if (validatedData.data.dateOfBirth) {
       updatePayload.dateOfBirth = new Date(validatedData.data.dateOfBirth);
     }
@@ -99,7 +108,7 @@ export async function PATCH(
 
     const updatedEmployee = await Employee.findByIdAndUpdate(
       id,
-      { $set: updatePayload },
+      { $set: updatePayload, ...(Object.keys(unsetPayload).length ? { $unset: unsetPayload } : {}) },
       { new: true, runValidators: true }
     )
       .populate('supervisorId', 'name email role')

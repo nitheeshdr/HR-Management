@@ -118,7 +118,9 @@ export async function POST(request: Request) {
         return apiError('Validation failed', 400);
       }
 
-      const { attendanceDate, entries, lock, unlock } = validated.data;
+      const { attendanceDate, entries, unlock } = validated.data;
+      // Supervisors get exactly one submission per day: every save is final and locks the day.
+      const lock = session.user.role === 'SUPERVISOR' ? true : validated.data.lock;
       const targetDate = parseDateToUtcMidnight(attendanceDate);
 
       // Verify permissions & block rules for supervisor
@@ -155,7 +157,7 @@ export async function POST(request: Request) {
 
         if (existingLocked) {
           return apiError(
-            "Attendance for today has already been finalized and locked. You cannot edit it anymore.",
+            'Attendance for today has already been submitted. Supervisors can edit attendance only once a day — contact an admin for corrections.',
             403
           );
         }
@@ -217,43 +219,13 @@ export async function POST(request: Request) {
 
       const { employeeId, attendanceDate, status, checkIn, checkOut, notes, lock, unlock } = validated.data;
 
-      // Verify permissions & block rules for supervisor
+      // Supervisors must submit the whole team's attendance in one daily submission (bulk mode),
+      // so per-employee saves — which would allow repeated edits — are admin-only.
       if (session.user.role === 'SUPERVISOR') {
-        const todayStr = getBusinessToday();
-        const reqDateStr = attendanceDate.split('T')[0];
-        if (reqDateStr !== todayStr) {
-          return apiError(
-            "Past and future dates are blocked for supervisors. Only today's attendance is open.",
-            403
-          );
-        }
-
-        const emp = await Employee.findById(employeeId).lean();
-        if (!emp || emp.supervisorId.toString() !== session.user.id) {
-          return apiError('Forbidden: Employee is not assigned to you', 403);
-        }
-
-        const targetDateCheck = parseDateToUtcMidnight(attendanceDate);
-
-        const nextDayCheck = new Date(targetDateCheck);
-        nextDayCheck.setUTCDate(nextDayCheck.getUTCDate() + 1);
-
-        const supervisedEmployees = await Employee.find({ supervisorId: session.user.id })
-          .select('_id')
-          .lean();
-
-        const existingLocked = await Attendance.findOne({
-          employeeId: { $in: supervisedEmployees.map((e) => e._id) },
-          attendanceDate: { $gte: targetDateCheck, $lt: nextDayCheck },
-          isLocked: true,
-        }).lean();
-
-        if (existingLocked) {
-          return apiError(
-            "Attendance for today has already been locked. You cannot edit it anymore.",
-            403
-          );
-        }
+        return apiError(
+          "Supervisors must submit today's attendance for the whole team at once, and can do so only once a day.",
+          403
+        );
       }
 
       const targetDate = parseDateToUtcMidnight(attendanceDate);

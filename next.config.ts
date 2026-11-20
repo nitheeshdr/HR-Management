@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // The employee form PDF template is read from disk at request time
+  outputFileTracingIncludes: {
+    '/api/employees/[id]/form-pdf': ['./assets/employee-form-template.pdf'],
+  },
   experimental: {
     agentFeedback: true,
   },

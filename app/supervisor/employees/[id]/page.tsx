@@ -15,6 +15,10 @@ import {
   Clock,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  DownloadEmployeeFormButton,
+  EmployeeFormDetailsView,
+} from '@/components/employees/employee-form-details';
 
 export default function SupervisorEmployeeDetailPage() {
   const params = useParams();
@@ -77,13 +81,16 @@ export default function SupervisorEmployeeDetailPage() {
         title={`${employee.fullName} (${employee.employeeCode})`}
         description={`${employee.designation} • ${employee.department}`}
       >
-        <Link
-          href="/supervisor/employees"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 transition-colors shadow-xs"
-        >
-          <ArrowLeft className="size-3.5" />
-          Back to Team
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/supervisor/employees"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 transition-colors shadow-xs"
+          >
+            <ArrowLeft className="size-3.5" />
+            Back to Team
+          </Link>
+          <DownloadEmployeeFormButton employeeId={employee._id} />
+        </div>
       </Header>
 
       <div className="p-8 space-y-6 max-w-5xl">
@@ -115,6 +122,8 @@ export default function SupervisorEmployeeDetailPage() {
             </div>
           </div>
         </div>
+
+        <EmployeeFormDetailsView employee={employee} />
 
         {/* Attendance Log Table */}
         <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">

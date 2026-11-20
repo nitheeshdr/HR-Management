@@ -21,6 +21,15 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  DownloadEmployeeFormButton,
+  EmployeeFormDetailsFields,
+  EmployeeFormDetailsView,
+  emptyEmployeeFormDetails,
+  employeeFormDetailsFromRecord,
+  employeeFormDetailsToPayload,
+  type EmployeeFormDetails,
+} from '@/components/employees/employee-form-details';
 
 interface Supervisor {
   _id: string;
@@ -78,6 +87,7 @@ export default function EmployeeDetailPage() {
   // Edit Employee State
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [savingEdit, setSavingEdit] = useState(false);
+  const [editDetails, setEditDetails] = useState<EmployeeFormDetails>(emptyEmployeeFormDetails);
   const [editForm, setEditForm] = useState({
     fullName: '',
     email: '',
@@ -156,6 +166,7 @@ export default function EmployeeDetailPage() {
       notes: employee.notes || '',
       reason: 'Admin updated employee record',
     });
+    setEditDetails(employeeFormDetailsFromRecord(employee));
     setIsEditOpen(true);
   };
 
@@ -166,7 +177,7 @@ export default function EmployeeDetailPage() {
       const res = await fetch(`/api/employees/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editForm),
+        body: JSON.stringify({ ...editForm, ...employeeFormDetailsToPayload(editDetails) }),
       });
 
       const data = await res.json();
@@ -237,6 +248,7 @@ export default function EmployeeDetailPage() {
             <Edit className="size-3.5" />
             Edit Employee
           </button>
+          <DownloadEmployeeFormButton employeeId={employee._id} />
           {employee.employmentStatus !== 'TERMINATED' && (
             <button
               onClick={handleTerminateEmployee}
@@ -432,6 +444,8 @@ export default function EmployeeDetailPage() {
           </div>
         )}
 
+        {activeTab === 'overview' && <EmployeeFormDetailsView employee={employee} />}
+
         {/* Tab 2: Attendance History */}
         {activeTab === 'attendance' && (
           <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
@@ -503,7 +517,7 @@ export default function EmployeeDetailPage() {
       {/* Edit Employee Modal */}
       {isEditOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-3xl w-full p-4 sm:p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 <Edit className="size-4 text-blue-600" />
@@ -643,6 +657,10 @@ export default function EmployeeDetailPage() {
                     onChange={(e) => setEditForm({ ...editForm, emergencyContactPhone: e.target.value })}
                     className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500"
                   />
+                </div>
+
+                <div className="md:col-span-2 space-y-4 bg-slate-50 -mx-2 p-2 rounded-xl">
+                  <EmployeeFormDetailsFields value={editDetails} onChange={setEditDetails} />
                 </div>
 
                 <div className="md:col-span-2">

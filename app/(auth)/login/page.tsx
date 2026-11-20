@@ -19,6 +19,7 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -54,6 +55,13 @@ export default function LoginPage() {
     } catch {
       setServerError('An unexpected error occurred. Please try again.');
     }
+  };
+
+  // Demo buttons: fill the credentials and sign in immediately
+  const quickLogin = (email: string, password: string) => {
+    setValue('email', email, { shouldValidate: true });
+    setValue('password', password, { shouldValidate: true });
+    handleSubmit(onSubmit)();
   };
 
   return (
@@ -176,33 +184,17 @@ export default function LoginPage() {
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <button
                   type="button"
-                  onClick={() => {
-                    const emailInput = document.getElementById('email') as HTMLInputElement;
-                    const passInput = document.getElementById('password') as HTMLInputElement;
-                    if (emailInput && passInput) {
-                      emailInput.value = 'admin@hrms.com';
-                      passInput.value = 'Admin@123456';
-                      emailInput.dispatchEvent(new Event('input', { bubbles: true }));
-                      passInput.dispatchEvent(new Event('input', { bubbles: true }));
-                    }
-                  }}
-                  className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium transition-colors text-center"
+                  onClick={() => quickLogin('admin@hrms.com', 'Admin@123456')}
+                  disabled={isSubmitting}
+                  className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium transition-colors text-center disabled:opacity-50 cursor-pointer"
                 >
                   Admin Credentials
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    const emailInput = document.getElementById('email') as HTMLInputElement;
-                    const passInput = document.getElementById('password') as HTMLInputElement;
-                    if (emailInput && passInput) {
-                      emailInput.value = 'supervisor@hrms.com';
-                      passInput.value = 'Supervisor@123456';
-                      emailInput.dispatchEvent(new Event('input', { bubbles: true }));
-                      passInput.dispatchEvent(new Event('input', { bubbles: true }));
-                    }
-                  }}
-                  className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium transition-colors text-center"
+                  onClick={() => quickLogin('supervisor@hrms.com', 'Supervisor@123456')}
+                  disabled={isSubmitting}
+                  className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium transition-colors text-center disabled:opacity-50 cursor-pointer"
                 >
                   Supervisor Credentials
                 </button>

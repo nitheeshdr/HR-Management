@@ -19,6 +19,28 @@ export interface IEmployee extends Document {
   emergencyContactPhone?: string;
   address?: string;
   notes?: string;
+  // --- Akashganga Employee Details Form fields ---
+  fatherOrHusbandName?: string;
+  maritalStatus?: 'UNMARRIED' | 'MARRIED';
+  religion?: string;
+  bloodGroup?: string;
+  photo?: string; // passport photo as a data URL (image/jpeg or image/png)
+  permanentAddress?: string;
+  familyMobileNumber?: string;
+  educationDetails?: string;
+  companyExperience?: string;
+  languagesKnown?: string;
+  policeVerification?: boolean;
+  shoeIssued?: boolean;
+  tShirtIssued?: boolean;
+  // Office use only
+  joiningCompany?: string;
+  aadharNo?: string;
+  panNo?: string;
+  uanNo?: string;
+  esicNo?: string;
+  bankAccountNo?: string;
+  ifscCode?: string;
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -108,6 +130,26 @@ const EmployeeSchema = new Schema<IEmployee>(
       trim: true,
       maxlength: [1000, 'Notes cannot exceed 1000 characters'],
     },
+    fatherOrHusbandName: { type: String, trim: true },
+    maritalStatus: { type: String, enum: ['UNMARRIED', 'MARRIED'] },
+    religion: { type: String, trim: true },
+    bloodGroup: { type: String, trim: true },
+    photo: { type: String },
+    permanentAddress: { type: String, trim: true },
+    familyMobileNumber: { type: String, trim: true },
+    educationDetails: { type: String, trim: true },
+    companyExperience: { type: String, trim: true },
+    languagesKnown: { type: String, trim: true },
+    policeVerification: { type: Boolean },
+    shoeIssued: { type: Boolean, default: false },
+    tShirtIssued: { type: Boolean, default: false },
+    joiningCompany: { type: String, trim: true },
+    aadharNo: { type: String, trim: true },
+    panNo: { type: String, trim: true, uppercase: true },
+    uanNo: { type: String, trim: true },
+    esicNo: { type: String, trim: true },
+    bankAccountNo: { type: String, trim: true },
+    ifscCode: { type: String, trim: true, uppercase: true },
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: 'User',

@@ -33,7 +33,7 @@ export function AppShell({
 
   return (
     <MobileNavContext.Provider value={{ isOpen, setIsOpen, toggle, close }}>
-      <div className="flex min-h-screen bg-slate-50 font-sans overflow-x-hidden">
+      <div className="flex h-dvh overflow-hidden bg-slate-50 font-sans">
         {/* Mobile Backdrop */}
         {isOpen && (
           <div
@@ -45,7 +45,7 @@ export function AppShell({
 
         {/* Sidebar: Desktop static, Mobile sliding drawer */}
         <div
-          className={`fixed inset-y-0 left-0 z-50 md:static md:z-auto transition-transform duration-300 ease-in-out md:translate-x-0 ${
+          className={`fixed inset-y-0 left-0 z-50 h-dvh md:static md:z-auto transition-transform duration-300 ease-in-out md:translate-x-0 ${
             isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
           }`}
         >
@@ -53,7 +53,7 @@ export function AppShell({
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-y-auto overflow-x-hidden">
           {children}
         </div>
       </div>

@@ -22,6 +22,46 @@ export const createEmployeeSchema = z.object({
   emergencyContactPhone: z.string().max(20).trim().optional(),
   address: z.string().max(500).trim().optional(),
   notes: z.string().max(1000).trim().optional(),
+  // Akashganga Employee Details Form fields
+  fatherOrHusbandName: z.string().max(150).trim().optional(),
+  maritalStatus: z.enum(['UNMARRIED', 'MARRIED']).optional().or(z.literal('')),
+  religion: z.string().max(50).trim().optional(),
+  bloodGroup: z.string().max(10).trim().optional(),
+  photo: z
+    .string()
+    .max(1_500_000, 'Photo is too large')
+    .regex(/^data:image\/(jpeg|png);base64,/, 'Photo must be a JPEG or PNG image')
+    .optional()
+    .or(z.literal('')),
+  permanentAddress: z.string().max(500).trim().optional(),
+  familyMobileNumber: z.string().max(20).trim().optional(),
+  educationDetails: z.string().max(200).trim().optional(),
+  companyExperience: z.string().max(200).trim().optional(),
+  languagesKnown: z.string().max(200).trim().optional(),
+  policeVerification: z.boolean().optional(),
+  shoeIssued: z.boolean().optional(),
+  tShirtIssued: z.boolean().optional(),
+  joiningCompany: z.string().max(150).trim().optional(),
+  aadharNo: z
+    .string()
+    .trim()
+    .regex(/^(\d{4}\s?\d{4}\s?\d{4})?$/, 'Aadhar number must be 12 digits')
+    .optional(),
+  panNo: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .regex(/^([A-Z]{5}\d{4}[A-Z])?$/, 'PAN must look like ABCDE1234F')
+    .optional(),
+  uanNo: z.string().max(20).trim().optional(),
+  esicNo: z.string().max(20).trim().optional(),
+  bankAccountNo: z.string().max(30).trim().optional(),
+  ifscCode: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .regex(/^([A-Z]{4}0[A-Z0-9]{6})?$/, 'IFSC must look like SBIN0001234')
+    .optional(),
 });
 
 export const updateEmployeeSchema = createEmployeeSchema.partial().extend({

@@ -55,6 +55,7 @@ function sanitizeData(
     'token',
     'secret',
     'sessionId',
+    'photo',
     '__v',
   ];
 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Header } from '@/components/layout/header';
-import { Search, Eye, Building, Mail, Phone, MapPin } from 'lucide-react';
+import { Search, Eye, Building, Mail, Phone, MapPin, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface EmployeeItem {
@@ -52,7 +52,15 @@ export default function SupervisorTeamPage() {
       <Header
         title="My Supervised Team"
         description="Direct reports under your supervisory allocation"
-      />
+      >
+        <Link
+          href="/supervisor/employees/new"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-xs shadow-blue-500/20"
+        >
+          <UserPlus className="size-3.5" />
+          Add Employee
+        </Link>
+      </Header>
 
       <div className="p-8 space-y-6 max-w-6xl">
         {/* Search */}

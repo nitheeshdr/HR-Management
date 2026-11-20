@@ -44,7 +44,7 @@ export function Sidebar({ role, onCloseMobile }: SidebarProps) {
   const links = role === 'ADMIN' ? adminLinks : supervisorLinks;
 
   return (
-    <aside className="w-64 bg-slate-900 border-r border-slate-800 text-slate-300 flex flex-col shrink-0 min-h-screen">
+    <aside className="w-64 bg-slate-900 border-r border-slate-800 text-slate-300 flex flex-col shrink-0 h-full min-h-0">
       {/* Brand Header */}
       <div className="h-16 flex items-center justify-between px-6 border-b border-slate-800 bg-slate-950/60">
         <div className="flex items-center gap-3">

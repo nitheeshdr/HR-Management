@@ -54,6 +54,7 @@ export async function GET(request: Request) {
 
     const [employees, total] = await Promise.all([
       Employee.find(query)
+        .select('-photo')
         .populate('supervisorId', 'name email role')
         .sort({ createdAt: -1 })
         .skip(skip)
@@ -84,12 +85,16 @@ export async function POST(request: Request) {
       return apiError('Unauthorized', 401);
     }
 
-    // Only Admin can create employees
-    if (session.user.role !== 'ADMIN') {
-      return apiError('Forbidden: Only Admins can create employees', 403);
+    // Admins and Supervisors can create employees
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'SUPERVISOR') {
+      return apiError('Forbidden: You are not allowed to create employees', 403);
     }
 
     const body = await request.json();
+    // A supervisor can only add employees to their own team
+    if (session.user.role === 'SUPERVISOR') {
+      body.supervisorId = session.user.id;
+    }
     const validatedData = createEmployeeSchema.safeParse(body);
 
     if (!validatedData.success) {
@@ -106,8 +111,11 @@ export async function POST(request: Request) {
 
     const employeeCode = await generateEmployeeCode();
 
+    const { maritalStatus, photo, ...rest } = validatedData.data;
     const employee = await Employee.create({
-      ...validatedData.data,
+      ...rest,
+      maritalStatus: maritalStatus || undefined,
+      photo: photo || undefined,
       employeeCode,
       dateOfBirth: validatedData.data.dateOfBirth ? new Date(validatedData.data.dateOfBirth) : undefined,
       joiningDate: new Date(validatedData.data.joiningDate),
@@ -121,7 +129,7 @@ export async function POST(request: Request) {
       entityType: 'EMPLOYEE',
       entityId: employee._id.toString(),
       after: employee.toJSON(),
-      reason: 'New employee created by admin',
+      reason: `New employee created by ${session.user.role === 'ADMIN' ? 'admin' : 'supervisor'}`,
     });
 
     return apiResponse(employee, 201);

@@ -1,7 +1,6 @@
 import { getSession } from '@/lib/auth';
 import connectDB from '@/lib/mongodb';
 import Attendance from '@/models/Attendance';
-import Employee from '@/models/Employee';
 import { correctAttendanceSchema } from '@/lib/validations/schemas';
 import { apiError, apiResponse } from '@/lib/utils/helpers';
 import { createAuditLog } from '@/lib/services/audit';
@@ -37,12 +36,13 @@ export async function PATCH(
       return apiError('Attendance record not found', 404);
     }
 
-    // Role check: Supervisor can only correct attendance for their assigned employee
-    if (session.user.role === 'SUPERVISOR') {
-      const emp = await Employee.findById(attendance.employeeId).lean();
-      if (!emp || emp.supervisorId.toString() !== session.user.id) {
-        return apiError('Forbidden: You can only correct attendance for assigned employees', 403);
-      }
+    // Supervisors can edit attendance only once a day (via the daily submission), so
+    // after-the-fact corrections are reserved for admins.
+    if (session.user.role !== 'ADMIN') {
+      return apiError(
+        'Forbidden: Supervisors can edit attendance only once a day. Contact an admin for corrections.',
+        403
+      );
     }
 
     const beforeState = attendance.toJSON();
